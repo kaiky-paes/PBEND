@@ -1,0 +1,2 @@
+101;Teclado Mecânico;350.50
+102;Mouse Gamer;150.75

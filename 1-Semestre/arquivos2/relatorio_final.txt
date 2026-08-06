@@ -1,0 +1,6 @@
+========== RELATÓRIO DE VENDAS ==========
+
+Produto: Teclado Gamer | Qtd: 10 | Total: R$ 1505,00
+Produto: Mouse Sem Fio | Qtd: 25 | Total: R$ 2000,00
+Produto: Monitor 24 Pol | Qtd: 5 | Total: R$ 4250,00
+Produto: Cabo HDMI | Qtd: 50 | Total: R$ 795,00
