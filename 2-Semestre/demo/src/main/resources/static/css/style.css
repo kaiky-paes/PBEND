@@ -1,0 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    text-align: center;
+    background-color: antiquewhite;
+}
+
+h1 {
+    color: #960016;
+    font-size: 150px;
+}
+
+img {
+    margin-top: 70px;
+    width: 50%;
+}
