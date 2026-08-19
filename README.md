@@ -4,6 +4,8 @@ Repositório destinado às atividades e projetos desenvolvidos na disciplina de 
 
 ## Tecnologias
 - Java
+- Groovy
+- Maven
 - Spring Boot
 - JSON
 - XML

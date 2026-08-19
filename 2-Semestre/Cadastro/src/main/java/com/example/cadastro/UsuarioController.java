@@ -1,39 +1,57 @@
 package com.example.cadastro;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-    ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+    final UsuarioRepository usuarioRepository;
 
     @GetMapping
-    public ArrayList<Usuario> listarTodosUsuarios() {
-        return listaUsuarios;
+    public List<Usuario> listarTodosUsuarios() {
+        return usuarioRepository.findAll();
     }
 
-    @GetMapping("/{id}")
-    public Usuario buscarUsuarioId(@PathVariable int id) {
-        return listaUsuarios.get(id);
-    }
+    /*@GetMapping("/{id}")
+    public Usuario buscarUsuarioId(@PathVariable UUID id) {
+        Optional<Usuario> usuarioOpt =
+        return usuarioRepository.findById(id);
+    }*/
 
     @PostMapping
     public Usuario cadastrarUsuario(@RequestBody Usuario usuario) {
-        listaUsuarios.add(usuario);
-        return listaUsuarios.getLast();
+        return usuarioRepository.save(usuario);
     }
 
     @PutMapping("/{id}")
-    public Usuario atualizarUsuario(@PathVariable int id, @RequestBody Usuario usuario) {
-        listaUsuarios.set(id,usuario);
-        return listaUsuarios.get(id);
+    public Usuario atualizarUsuario(@PathVariable UUID id, @RequestBody Usuario usuario) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+
+        if (usuarioOpt.isPresent()) {
+            Usuario usuarioAtualizado = usuarioOpt.get();
+            usuarioAtualizado.setNome(usuario.getNome());
+            usuarioAtualizado.setCpf(usuario.getCpf());
+            usuarioAtualizado.setEmail(usuario.getEmail());
+            return usuarioRepository.save(usuarioAtualizado);
+        } else {
+            throw new RuntimeException("Usuário não encontrado com o ID: " + id);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void removerUsuario (@PathVariable int id) {
-        listaUsuarios.remove(id);
+    public void removerUsuario (@PathVariable UUID id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            usuarioRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Usuário não encontrado com o ID: " + id);
+        }
     }
 }
