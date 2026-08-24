@@ -1,0 +1,15 @@
+[ {
+  "id" : 1,
+  "produto" : "lego",
+  "categoria" : "brinquedo",
+  "valorUnitario" : 5.0,
+  "quantidade" : 2,
+  "valorTotal" : 2.0
+}, {
+  "id" : 2,
+  "produto" : "Lego Tubarao",
+  "categoria" : "Brinquedo",
+  "valorUnitario" : 50.0,
+  "quantidade" : 2,
+  "valorTotal" : 2.0
+} ]
