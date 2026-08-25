@@ -19,11 +19,15 @@ public class UsuarioController {
         return usuarioRepository.findAll();
     }
 
-    /*@GetMapping("/{id}")
+    @GetMapping("/{id}")
     public Usuario buscarUsuarioId(@PathVariable UUID id) {
-        Optional<Usuario> usuarioOpt =
-        return usuarioRepository.findById(id);
-    }*/
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            return usuarioOpt.get();
+        } else {
+            throw new RuntimeException("Usuário não encontrado.");
+        }
+    }
 
     @PostMapping
     public Usuario cadastrarUsuario(@RequestBody Usuario usuario) {
@@ -32,26 +36,16 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     public Usuario atualizarUsuario(@PathVariable UUID id, @RequestBody Usuario usuario) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        Usuario usuarioExistente = buscarUsuarioId(id);
+        usuarioExistente.setNome(usuario.getNome());
+        usuarioExistente.setCpf(usuario.getCpf());
+        usuarioExistente.setEmail(usuario.getEmail());
 
-        if (usuarioOpt.isPresent()) {
-            Usuario usuarioAtualizado = usuarioOpt.get();
-            usuarioAtualizado.setNome(usuario.getNome());
-            usuarioAtualizado.setCpf(usuario.getCpf());
-            usuarioAtualizado.setEmail(usuario.getEmail());
-            return usuarioRepository.save(usuarioAtualizado);
-        } else {
-            throw new RuntimeException("Usuário não encontrado com o ID: " + id);
-        }
+        return usuarioRepository.save(usuarioExistente);
     }
 
     @DeleteMapping("/{id}")
-    public void removerUsuario (@PathVariable UUID id) {
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
-        if (usuarioOpt.isPresent()) {
-            usuarioRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Usuário não encontrado com o ID: " + id);
-        }
+    public void removerUsuario(@PathVariable UUID id) {
+        usuarioRepository.delete(buscarUsuarioId(id));
     }
 }
