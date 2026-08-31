@@ -43,7 +43,7 @@ public class PedidoDAO {
             comando.setInt(5, pedido.getProdutoId());
             comando.setInt(6, pedido.getQuantidade());
             comando.setDouble(7, pedido.getValorOriginal());
-            comando.setDouble(8, pedido.getPercentual());
+            comando.setDouble(8, pedido.getPercentualDesconto());
             comando.setDouble(9, pedido.getValorFinal());
             comando.setString(10, pedido.getStatus());
             comando.executeUpdate();

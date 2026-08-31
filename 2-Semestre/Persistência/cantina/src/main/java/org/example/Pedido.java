@@ -88,11 +88,11 @@ public class Pedido {
         this.valorOriginal = valorOriginal;
     }
 
-    public double getPercentual() {
+    public double getPercentualDesconto() {
         return percentual;
     }
 
-    public void setPercentual(double percentual) {
+    public void setPercentualDesconto(double percentual) {
         this.percentual = percentual;
     }
 
