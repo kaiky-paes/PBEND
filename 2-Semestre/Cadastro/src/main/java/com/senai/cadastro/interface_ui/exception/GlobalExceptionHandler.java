@@ -1,10 +1,12 @@
 package com.senai.cadastro.interface_ui.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 import static com.senai.cadastro.interface_ui.exception.ProblemDetailUtils.buildProblem;
 
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
@@ -47,6 +50,19 @@ public class GlobalExceptionHandler {
 
         problem.setProperty("errors", errors);
         return problem;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrity(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request
+    ) {
+        return buildProblem(
+                HttpStatus.CONFLICT,
+                "Conflito de dados",
+                "A operação viola uma restrição de integridade dos dados",
+                request.getRequestURI()
+        );
     }
 
     @ExceptionHandler(InternalError.class)

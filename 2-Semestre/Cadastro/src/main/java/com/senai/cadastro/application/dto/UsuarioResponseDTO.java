@@ -4,7 +4,7 @@ import com.senai.cadastro.domain.entity.Usuario;
 
 import java.util.UUID;
 
-public class UsuarioResponseDTO(
+public record UsuarioResponseDTO(
         UUID id,
         String nome,
         String cpf,

@@ -34,7 +34,8 @@ public class UsuarioService {
 
     public UsuarioResponseDTO save(UsuarioRequestDTO usuarioRequestDTO) {
         return UsuarioResponseDTO.fromEntity(
-                usuarioRepository.save(usuarioRequestDTO.toEntity());
+                usuarioRepository.save(usuarioRequestDTO.toEntity())
+        );
     }
 
     public UsuarioResponseDTO update(UsuarioRequestDTO usuarioRequestDTO, UUID id) {
