@@ -2,12 +2,12 @@ package org.example;
 
 public class Recado {
     private final int id;
-    private final String actor;
+    private final String autor;
     private final String message;
 
-    public Recado(int id, String actor, String message) {
+    public Recado(int id, String autor, String message) {
         this.id = id;
-        this.actor = actor;
+        this.autor = autor;
         this.message = message;
     }
 
@@ -15,8 +15,8 @@ public class Recado {
         return id;
     }
 
-    public String getActor() {
-        return actor;
+    public String getAutor() {
+        return autor;
     }
 
     public String getMessage() {
@@ -25,7 +25,7 @@ public class Recado {
 
     public String toJson() {
         return "{\"id\":" + id
-                + ",\"actor\":\"" + escapar(actor)
+                + ",\"autor\":\"" + escapar(autor)
                 + "\",\"message\":\"" + escapar(message) + "\"}";
     }
     //metodo para tratar o texto recebido para o formato correto do JSON

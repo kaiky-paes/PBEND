@@ -4,9 +4,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +23,7 @@ public class Main {
         //0.0.0.0 aceita conexoes de qualquer ip da rede (outro pc, celular)
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8080), 0);
 
-        server.createContext("/api/notes", Main::atenderRecados);
+        server.createContext("/api/notes", Main::listenRecados);
         server.createContext("/", Main::openPage);
         server.start();
 
@@ -33,46 +37,46 @@ public class Main {
         }
     }
 
-    private static void atenderRecados(HttpExchange troca) {
+    private static void listenRecados(HttpExchange exchange) throws IOException {
         //permite que o app Android e outros clientes acessem a API
-        troca.getRequestHeaders().set("Acess-Control-Allow-Origin", "*");
-        troca.getRequestHeaders().set("Acess-Control-Allow-Methods", "GET, POST, OPTIONS");
-        troca.getRequestHeaders().set("Acess-Control-Allow-Headers", "Content-Type");
+        exchange.getRequestHeaders().set("Acess-Control-Allow-Origin", "*");
+        exchange.getRequestHeaders().set("Acess-Control-Allow-Methods", "GET, POST, OPTIONS");
+        exchange.getRequestHeaders().set("Acess-Control-Allow-Headers", "Content-Type");
 
         try {
-            if (troca.getRequestMethod().equals("OPTIONS")) {
-                troca.sendResponseHeaders(204, -1);
-                troca.close();
-            } else if (troca.getResponseHeaders().equals("GET")) {
-                listar(troca);
-            } else if (troca.getResponseHeaders().equals("POST")) {
-                cadastrar(troca);
+            if (exchange.getRequestMethod().equals("OPTIONS")) {
+                exchange.sendResponseHeaders(204, -1);
+                exchange.close();
+            } else if (exchange.getResponseHeaders().equals("GET")) {
+                list(exchange);
+            } else if (exchange.getResponseHeaders().equals("POST")) {
+                create(exchange);
             } else {
-                troca.getRequestHeaders().set("Allow", "GET, POST, OPTIONS");
-                responder(troca, 405, "{\"erro\":\"Método não permitido\"}");
+                exchange.getRequestHeaders().set("Allow", "GET, POST, OPTIONS");
+                response(exchange, 405, "{\"erro\":\"Método não permitido\"}");
             }
         } catch (
                 SQLException erro) {
             erro.printStackTrace();
-            responder(troca, 500, "{\"erro\":\"Erro ao acessar o banco\"}");
+            response(exchange, 500, "{\"erro\":\"Erro ao acessar o banco\"}");
         }
     }
 
-    private static void cadastrar(HttpExchange troca) throws IOException, SQLException {
+    private static void create(HttpExchange exchange) throws IOException, SQLException {
         //Map: guarda informações no formato chave e valor, como um pequeno dicionário
-        Map<String, String> dados = lerFormulario(troca);
-        String actor = dados.getOrDefault("actor", "").trim();
-        String message = dados.getOrDefault("menssage", "").trim();
-        if (actor.isEmpty() || message.isEmpty()) {
-            responder(troca, 400, "{\"erro\":\"Preencha todos os campos\"}");
+        Map<String, String> data = readForm(exchange);
+        String autor = data.getOrDefault("autor", "").trim();
+        String message = data.getOrDefault("menssage", "").trim();
+        if (autor.isEmpty() || message.isEmpty()) {
+            response(exchange, 400, "{\"erro\":\"Preencha todos os campos\"}");
             return;
         }
-        DAO.cadastrar(new Recado(0, actor, message));
-        responder(troca, 201, "{\"message\":\"Recado cadastrado\"}");
+        DAO.create(new Recado(0, autor, message));
+        response(exchange, 201, "{\"message\":\"Recado cadastrado\"}");
     }
 
-    private static void listar(HttpExchange troca) throws IOException, SQLException {
-        List<Recado> notes = DAO.listar();
+    private static void list(HttpExchange exchange) throws IOException, SQLException {
+        List<Recado> notes = DAO.list();
         //StringBuilder: classe para construir e alterar textos sem criar novas Strings a cada mudança
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < notes.size(); i++) {
@@ -82,6 +86,54 @@ public class Main {
             json.append(notes.get(i).toJson());
         }
         json.append("]");
-        responder(troca, 200, json.toString());
+        response(exchange, 200, json.toString());
+    }
+
+    private static Map<String, String> readForm(HttpExchange exchange) throws IOException {
+        String body = new String(
+                exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8
+        );
+        //HashMap: classe que implementa o Map
+        //Map = List e ArrayList = HashMap
+        Map<String, String> data = new HashMap<>();
+        for (String field : body.split("&")) {
+            String[] parts = field.split("=", 2);
+            String name = URLDecoder.decode(parts[0], StandardCharsets.UTF_8);
+            String value = parts.length == 2
+                    ? URLDecoder.decode(parts[1], StandardCharsets.UTF_8) : "";
+            //put: adiciona uma chave e um valor no Map
+            data.put(name, value);
+        }
+        return data;
+    }
+
+    private static void openPage(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equals("GET")) {
+            response(exchange, 405, "Método não permitido", "text/plain");
+            return;
+        }
+        try (InputStream file = Main.class.getResourceAsStream("/public/index.html")) {
+            if (file == null) {
+                response(exchange, 404, "Página não encontrada", "text/plain");
+                return;
+            }
+            byte[] page = file.readAllBytes();
+            exchange.getResponseHeaders().set("Context-Type", "text/html; charset=UTF_8");
+            exchange.sendResponseHeaders(200, page.length);
+            exchange.getResponseBody().write(page);
+            exchange.close();
+        }
+    }
+
+    private static void response(HttpExchange exchange, int status, String content) throws IOException {
+        response(exchange, status, content, "application/json");
+    }
+
+    private static void response(HttpExchange exchange, int status, String content, String type) throws IOException {
+        byte[] response = content.getBytes(StandardCharsets.UTF_8);
+        exchange.getRequestHeaders().set("Context-Type", type + "; charset=UTF-8");
+        exchange.sendResponseHeaders(status, response.length);
+        exchange.getResponseBody().write(response);
+        exchange.close();
     }
 }

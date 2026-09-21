@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural de Recados</title>
+    <!-- ctrl + ; : atalho para comentar no vscode -->
+    <!-- icone na guia (png ou icon) -->
+    <link rel="shortcut icon" href="img/icone.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- header>h1{Mural de Recados}+p{Front + Java + JDBC + MySQL} -->
+    <header>
+        <h1>Mural de Recados</h1>
+        <p>Front + Java + JDBC + MySQL</p>
+    </header>
+    
+    <main>
+        <form id="form-recado">
+            <label for="autor">Nome</label>
+            <input id="autor" name="autor" maxlenght="80" required>
+            <label for="message">Recado</label>
+            <textarea id="message" name="message" maxlength="255"></textarea>
+            <button type="submit">Publicar recado</button>
+        </form>
+        <p id="aviso"></p>
+        <h2>Recados publicados</h2>
+        <section id="lista-recados"></section>
+    </main>
+</body>
+</html>

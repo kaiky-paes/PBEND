@@ -8,19 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecadoDAO {
-    public void cadastrar(Recado note) throws SQLException {
-        String sql = "INSERT INTO recado (actor, message) VALUES(?,?)";
+    public void create(Recado note) throws SQLException {
+        String sql = "INSERT INTO recado (autor, message) VALUES(?,?)";
 
         try (Connection connection = Conexao.open();
              PreparedStatement command = connection.prepareStatement(sql)) {
-            command.setString(1, note.getActor());
+            command.setString(1, note.getAutor());
             command.setString(2, note.getMessage());
             command.executeUpdate();
         }
     }
 
-    public List<Recado> listar() throws SQLException {
-        String sql = "SELECT id, actor, message FROM recado ORDER BY id DESC";
+    public List<Recado> list() throws SQLException {
+        String sql = "SELECT id, autor, message FROM recado ORDER BY id DESC";
         List<Recado> notes = new ArrayList<>();
 
         try (Connection connection = Conexao.open();
