@@ -1,4 +1,4 @@
-package com.senai.cadastro.infraestructure;
+package com.senai.cadastro.infrastructure.config;
 
 import com.senai.cadastro.interface_ui.exception.ProblemDetailUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -90,7 +90,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationEntryPoint restAuthenticationEntryPoint(JsonMapper jsonMapper) {
-        return (request,response,exception
+        return (request, response, exception
         ) -> writeProblem(
                 response,
                 HttpStatus.UNAUTHORIZED,
@@ -104,7 +104,7 @@ public class SecurityConfig {
     @Bean
     public AccessDeniedHandler restAccessDeniedHandler(JsonMapper jsonMapper) {
 
-        return (request,response,exception
+        return (request, response, exception
         ) -> writeProblem(
                 response,
                 HttpStatus.FORBIDDEN,
@@ -160,6 +160,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
     private static void writeProblem(
             HttpServletResponse response,
             HttpStatus status,
@@ -180,6 +181,6 @@ public class SecurityConfig {
         response.setContentType("application/problem+json");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
-        jsonMapper.writeValue(response.getWriter(),problem);
+        jsonMapper.writeValue(response.getWriter(), problem);
     }
 }
